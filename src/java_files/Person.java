@@ -46,4 +46,9 @@ public class Person {
     public void setAge(int age) {
         this.age = age;
     }
+
+    public void logPersonInfo(){
+        System.out.printf("The %s %s info:\nThe %s is %d years old and %s married\n",
+                this.name, this.surName, this.name, this.age, this.isMarriage ? "is" : "isn't");
+    }
 }

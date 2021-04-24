@@ -95,3 +95,132 @@ Array.prototype.multByWithProt = function (n){ //добавляем в наш м
 }
 
 console.log(array.multByWithProt(5));
+
+/*
+    Замыкания.
+    Парадигма, в которой одна функция вызывает внутри себя другую функцию. При этом, если в родительскую функцию передать
+    некоторый параметр, который будет далее использован в дочерней функции, то этот параметр будет замкнут в результате
+    вывода дочерней функции.
+ */
+
+function createCalcFun(n){
+    return function (){
+        console.log(1000 * n);
+    }
+}
+
+let calcFun = createCalcFun(17);
+console.log(calcFun());
+
+function createMultiplier(base){
+    return function multiplyOn(num){
+        return base * num;
+    }
+}
+
+const multSeventeen = createMultiplier(17);
+console.log(multSeventeen(2));
+
+const user1 = {
+    name: 'Alex',
+    nick: 'Dominator2000',
+    age: 21
+};
+
+const user2 = {
+    name: 'Sonya',
+    nick: 'Sophyetta_the_prettiest',
+    age: 43
+};
+
+
+
+function logUser(){
+    console.group('User info:');
+    console.log(`Name: ${this.name}\nNickname: ${this.nick}\nAge: ${this.age}`);
+    console.groupEnd();
+}
+
+function bind(context, func){
+    return function(...args){
+        func.apply(context, args);
+    }
+}
+
+res = bind(user1, logUser);
+res();
+
+/*
+    Асинхронность.
+    Реализуется при помощи функции из API брузера - setTimeout() глобального объекта window.
+    В качестве параметров принимает функцию (анонимную или уже существующую), в которой будет
+    прописана какая то логика и количество милисекунд, через кооторые логика будет выполнена.
+    Асинхронность достигается за счёт EventLoop - итератора, который проходит по Callback Queue в поисках асинхронных
+    функций, которые выполнили свой код.
+    Концепт, при котором интерпритатор при проходе по коду перемещает функции в Call Stack и разбирает их внутри стека.
+    В том случае, если он натыкается на setTimeout (браузерный API), или любую другую асинхронную функцию, он убирает
+    setTimeout из стека, но регистрирует функцию, которая передана в setTimeout  в очереди и ждёт, пока браузер выполнит
+    код внутри функции, возвращая её из Callback Queue в Call Stack в качестве анонимной функции.
+    В случае setTimeout, даже если поставить время ожидания 0 мс, всё-равно выполнение переданной функции осуществится
+    после выполнения синхронных функций.
+
+ */
+
+// console.log('Usual function');
+// setTimeout(function (){
+//     console.log('After 4 seconds');
+// }, 0);
+// console.log('Instant after setTimeout');
+// console.log('Instant after setTimeout1');
+// console.log('Instant after setTimeout2');
+// console.log('Instant after setTimeout3');
+
+/*
+    Promise.
+    Используются для облегчения работы с асинхронными операциями в том случае, когда логика асинхронных вызовов реализуется
+    через вложенные callback-и.
+ */
+
+console.log('Request data...'); //эмуляция запроса к серверу
+// setTimeout(()=>{
+//     console.log('Preparing data...'); //эмуляция ответа сервера (2 сек)
+//
+//
+//
+//     const backendData = { //эмуляция сформированных на бэке данных
+//         server: 'aws',
+//         port: 2000,
+//         status: 'working'
+//     }
+//
+//     setTimeout(() => { //эмуляция переданных с сервера данных во вложенной функции
+//         backendData.modified = true;
+//         console.log('Data received...', backendData);
+//     }, 2000);
+// }, 2000);
+
+const promise = new Promise((resolve, reject) =>{
+    setTimeout(() => {
+        console.log('Preparing data...'); //эмуляция ответа сервера (2 сек)
+        const backendData = { //эмуляция сформированных на бэке данных
+            server: 'aws',
+            port: 2000,
+            status: 'working'
+        }
+        resolve(backendData);
+    }, 2000);
+})
+
+promise.then((data) => {
+    const p2 = new Promise((resolve, reject) => {
+        setTimeout(() => {
+            data.modified = true;
+            resolve(data);
+            // console.log('Data received', data);
+        });
+    })
+    p2.then(clientData => {
+            console.log('Data received', clientData);
+        }
+    )
+})
